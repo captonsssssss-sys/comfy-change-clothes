@@ -30,7 +30,7 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git /root/ComfyUI
 WORKDIR /root/ComfyUI
 
 RUN pip3 install -r requirements.txt
-RUN pip3 install gdown
+RUN pip3 install gdown jupyterlab
 
 # Custom nodes
 WORKDIR /root/ComfyUI/custom_nodes
@@ -76,8 +76,12 @@ RUN gdown "https://drive.google.com/uc?id=1sJgfpKsWN-AeNGPqaPKiHCm6bUhRf4Qo" \
 # Workflow
 COPY ["Change Clothes.json", "/root/ComfyUI/user/default/workflows/Change Clothes.json"]
 
+# Стартовый скрипт для RunPod
+COPY start.sh /root/start.sh
+RUN chmod +x /root/start.sh
+
 WORKDIR /root/ComfyUI
 
-EXPOSE 8188
+EXPOSE 8188 8888
 
-CMD ["python3", "main.py", "--listen", "0.0.0.0", "--port", "8188"]
+CMD ["/root/start.sh"]
