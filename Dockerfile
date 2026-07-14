@@ -54,29 +54,35 @@ RUN mkdir -p \
     /root/ComfyUI/user/default/workflows
 
 # LoRA для переодевания
-RUN gdown "https://drive.google.com/uc?id=1RjHqgUIg1O9xmLwUC-LXdStTTPqqppVE" \
+RUN gdown \
+    "https://drive.google.com/uc?id=1RjHqgUIg1O9xmLwUC-LXdStTTPqqppVE" \
     -O "/root/ComfyUI/models/loras/clothes_tryon_qwen-edit-lora.safetensors"
 
-# Text encoder
-RUN gdown "https://drive.google.com/uc?id=1cxt-emUAwU3oYTxaBYYn0b6yPjNje_RR" \
-    -O "/root/ComfyUI/models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors"
+# Text encoder — скачивание напрямую через Google Drive
+RUN curl --fail --location --retry 5 --retry-delay 5 \
+    "https://drive.usercontent.google.com/download?id=1cxt-emUAwU3oYTxaBYYn0b6yPjNje_RR&export=download&confirm=t" \
+    --output "/root/ComfyUI/models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors" \
+    && test $(stat -c%s "/root/ComfyUI/models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors") -gt 1000000000
 
 # VAE
-RUN gdown "https://drive.google.com/uc?id=1ePx6uMgnwnl6jDOGK2or1hZmOLZhRwkv" \
+RUN gdown \
+    "https://drive.google.com/uc?id=1ePx6uMgnwnl6jDOGK2or1hZmOLZhRwkv" \
     -O "/root/ComfyUI/models/vae/qwen_image_vae.safetensors"
 
 # Qwen Image Edit
-RUN gdown "https://drive.google.com/uc?id=12q4Mg9k4WZMocPRoYGQdTIU7pDBDlx4H" \
+RUN gdown \
+    "https://drive.google.com/uc?id=12q4Mg9k4WZMocPRoYGQdTIU7pDBDlx4H" \
     -O "/root/ComfyUI/models/diffusion_models/qwen_image_edit_2509_fp8_e4m3fn.safetensors"
 
 # Lightning LoRA
-RUN gdown "https://drive.google.com/uc?id=1sJgfpKsWN-AeNGPqaPKiHCm6bUhRf4Qo" \
+RUN gdown \
+    "https://drive.google.com/uc?id=1sJgfpKsWN-AeNGPqaPKiHCm6bUhRf4Qo" \
     -O "/root/ComfyUI/models/loras/Qwen-Image-Edit-2509-Lightning-4steps-V1.0-bf16.safetensors"
 
 # Workflow
 COPY ["Change Clothes.json", "/root/ComfyUI/user/default/workflows/Change Clothes.json"]
 
-# Стартовый скрипт для RunPod
+# Запуск JupyterLab и ComfyUI в RunPod
 COPY start.sh /root/start.sh
 RUN chmod +x /root/start.sh
 
